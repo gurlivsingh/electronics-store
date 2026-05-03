@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Electronics Store Management System — A comprehensive DBMS project for managing products, inventory, customers, sales, and employees.">
+    <title>ElectraStore — Electronics Store Management System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app-wrapper">
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚡</div>
+                <div>
+                    <div class="sidebar-title">ElectraStore</div>
+                    <div class="sidebar-subtitle">Management System</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Main</div>
+                <div class="nav-item active" data-page="dashboard" id="nav-dashboard">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-page="products" id="nav-products">
+                    <span class="icon">📦</span>
+                    <span>Products</span>
+                </div>
+                <div class="nav-item" data-page="inventory" id="nav-inventory">
+                    <span class="icon">🏪</span>
+                    <span>Inventory</span>
+                    <span class="badge" id="lowStockBadge" style="display:none">0</span>
+                </div>
+
+                <div class="nav-section-label">Sales</div>
+                <div class="nav-item" data-page="orders" id="nav-orders">
+                    <span class="icon">🧾</span>
+                    <span>Orders & Billing</span>
+                </div>
+                <div class="nav-item" data-page="customers" id="nav-customers">
+                    <span class="icon">👥</span>
+                    <span>Customers</span>
+                </div>
+
+                <div class="nav-section-label">Organization</div>
+                <div class="nav-item" data-page="employees" id="nav-employees">
+                    <span class="icon">👔</span>
+                    <span>Employees</span>
+                </div>
+                <div class="nav-item" data-page="reports" id="nav-reports">
+                    <span class="icon">📈</span>
+                    <span>Reports</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- ============ MAIN CONTENT ============ -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+                    <div>
+                        <div class="header-title" id="pageTitle">Dashboard</div>
+                        <div class="header-breadcrumb" id="pageBreadcrumb">Home / Dashboard</div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="globalSearch" placeholder="Search products, customers...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content Area -->
+            <div class="page-content">
+                <!-- ============ DASHBOARD PAGE ============ -->
+                <section class="page-section active" id="page-dashboard">
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid" id="kpiGrid">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div>
+                                    <div class="kpi-value" id="kpi-products">—</div>
+                                    <div class="kpi-label">Total Products</div>
+                                </div>
+                                <div class="kpi-icon">📦</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div>
+                                    <div class="kpi-value" id="kpi-customers">—</div>
+                                    <div class="kpi-label">Customers</div>
+                                </div>
+                                <div class="kpi-icon">👥</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div>
+                                    <div class="kpi-value" id="kpi-revenue">—</div>
+                                    <div class="kpi-label">Total Revenue</div>
+                                </div>
+                                <div class="kpi-icon">💰</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div>
+                                    <div class="kpi-value" id="kpi-orders">—</div>
+                                    <div class="kpi-label">Total Orders</div>
+                                </div>
+                                <div class="kpi-icon">🧾</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <!-- Recent Orders -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">🕐 Recent Orders</h3>
+                                <button class="btn btn-ghost btn-sm" onclick="navigateTo('orders')">View All</button>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order</th>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentOrdersBody">
+                                        <tr><td colspan="4"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Low Stock Alerts -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">⚠️ Low Stock Alerts</h3>
+                                <button class="btn btn-ghost btn-sm" onclick="navigateTo('inventory')">View All</button>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Stock</th>
+                                            <th>Reorder</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alertsBody">
+                                        <tr><td colspan="4"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ PRODUCTS PAGE ============ -->
+                <section class="page-section" id="page-products">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2>Product Catalog</h2>
+                        <button class="btn btn-primary" onclick="openModal('productModal')">+ Add Product</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📦 All Products</h3>
+                            <select class="form-control" style="width:200px" id="productCategoryFilter" onchange="loadProducts()">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Product Name</th>
+                                        <th>Brand</th>
+                                        <th>Category</th>
+                                        <th>Price (₹)</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsBody">
+                                    <tr><td colspan="8"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ INVENTORY PAGE ============ -->
+                <section class="page-section" id="page-inventory">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2>Inventory Management</h2>
+                        <button class="btn btn-accent" onclick="openModal('restockModal')">📥 Restock Product</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🏪 Stock Levels</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Brand</th>
+                                        <th>Category</th>
+                                        <th>Price (₹)</th>
+                                        <th>In Stock</th>
+                                        <th>Reorder Level</th>
+                                        <th>Stock Value (₹)</th>
+                                        <th>Health</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryBody">
+                                    <tr><td colspan="9"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ ORDERS PAGE ============ -->
+                <section class="page-section" id="page-orders">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2>Orders & Billing</h2>
+                        <button class="btn btn-primary" onclick="openModal('orderModal')">+ New Order</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🧾 All Orders</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order #</th>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Handled By</th>
+                                        <th>Items</th>
+                                        <th>Total (₹)</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersBody">
+                                    <tr><td colspan="9"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ CUSTOMERS PAGE ============ -->
+                <section class="page-section" id="page-customers">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2>Customer Management</h2>
+                        <button class="btn btn-primary" onclick="openModal('customerModal')">+ Register Customer</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">👥 All Customers</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>City</th>
+                                        <th>Orders</th>
+                                        <th>Lifetime Spend (₹)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersBody">
+                                    <tr><td colspan="8"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ EMPLOYEES PAGE ============ -->
+                <section class="page-section" id="page-employees">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2>Employee Directory</h2>
+                        <button class="btn btn-primary" onclick="openModal('employeeModal')">+ Add Employee</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">👔 All Employees</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Hire Date</th>
+                                        <th>Salary (₹)</th>
+                                        <th>Orders Handled</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeesBody">
+                                    <tr><td colspan="9"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ REPORTS PAGE ============ -->
+                <section class="page-section" id="page-reports">
+                    <h2 class="mb-3">Reports & Analytics</h2>
+                    
+                    <!-- Sales Report -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">📈 Sales Report</h3>
+                            <div class="flex items-center gap-2">
+                                <input type="date" class="form-control" id="reportStartDate" value="2026-01-01" style="width:160px">
+                                <span class="text-muted">to</span>
+                                <input type="date" class="form-control" id="reportEndDate" value="2026-12-31" style="width:160px">
+                                <button class="btn btn-primary btn-sm" onclick="loadSalesReport()">Generate</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="salesReportSummary" class="kpi-grid mb-3"></div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Customer</th>
+                                            <th>Date</th>
+                                            <th>Amount (₹)</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="salesReportBody">
+                                        <tr><td colspan="5" class="text-center text-muted" style="padding:40px">Click "Generate" to view the sales report</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Revenue -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">📊 Category Sales Summary</h3>
+                            <button class="btn btn-ghost btn-sm" onclick="loadCategorySummary()">Refresh</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Products</th>
+                                        <th>Units Sold</th>
+                                        <th>Revenue (₹)</th>
+                                        <th>Avg Price (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categorySummaryBody">
+                                    <tr><td colspan="5"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🏆 Top Selling Products</h3>
+                            <button class="btn btn-ghost btn-sm" onclick="loadTopProducts()">Refresh</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product</th>
+                                        <th>Brand</th>
+                                        <th>Category</th>
+                                        <th>Units Sold</th>
+                                        <th>Revenue (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topProductsBody">
+                                    <tr><td colspan="6"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============ MODALS ============ -->
+    
+    <!-- Add Product Modal -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">➕ Add New Product</h3>
+                <button class="modal-close" onclick="closeModal('productModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm" onsubmit="return submitProduct(event)">
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="prod_name" placeholder="e.g., MacBook Pro 16" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-control" id="prod_category" required>
+                                <option value="">Select category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Brand</label>
+                            <input type="text" class="form-control" id="prod_brand" placeholder="e.g., Apple" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price (₹)</label>
+                        <input type="number" step="0.01" class="form-control" id="prod_price" placeholder="e.g., 149900" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Specifications</label>
+                        <textarea class="form-control" id="prod_specs" placeholder="Detailed specifications..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('productModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('productForm').requestSubmit()">Add Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Customer Modal -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">👤 Register Customer</h3>
+                <button class="modal-close" onclick="closeModal('customerModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="customerForm" onsubmit="return submitCustomer(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="cust_fname" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="cust_lname" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="cust_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="cust_phone" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" id="cust_address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" id="cust_city">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('customerModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('customerForm').requestSubmit()">Register</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Order Modal -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">🧾 Create New Order</h3>
+                <button class="modal-close" onclick="closeModal('orderModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm" onsubmit="return submitOrder(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Customer</label>
+                            <select class="form-control" id="order_customer" required>
+                                <option value="">Select customer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employee</label>
+                            <select class="form-control" id="order_employee" required>
+                                <option value="">Select employee</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select class="form-control" id="order_payment" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Debit Card">Debit Card</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Net Banking">Net Banking</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('orderModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('orderForm').requestSubmit()">Create Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Order Item Modal -->
+    <div class="modal-overlay" id="orderItemModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">➕ Add Item to Order</h3>
+                <button class="modal-close" onclick="closeModal('orderItemModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="orderItemForm" onsubmit="return submitOrderItem(event)">
+                    <input type="hidden" id="item_order_id">
+                    <div class="form-group">
+                        <label class="form-label">Product</label>
+                        <select class="form-control" id="item_product" required>
+                            <option value="">Select product</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" min="1" class="form-control" id="item_quantity" value="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('orderItemModal')">Cancel</button>
+                <button class="btn btn-accent" onclick="document.getElementById('orderItemForm').requestSubmit()">Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restock Modal -->
+    <div class="modal-overlay" id="restockModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">📥 Restock Product</h3>
+                <button class="modal-close" onclick="closeModal('restockModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="restockForm" onsubmit="return submitRestock(event)">
+                    <div class="form-group">
+                        <label class="form-label">Product</label>
+                        <select class="form-control" id="restock_product" required>
+                            <option value="">Select product</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity to Add</label>
+                        <input type="number" min="1" class="form-control" id="restock_qty" placeholder="e.g., 50" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('restockModal')">Cancel</button>
+                <button class="btn btn-accent" onclick="document.getElementById('restockForm').requestSubmit()">Restock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div class="modal-overlay" id="employeeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">👔 Add Employee</h3>
+                <button class="modal-close" onclick="closeModal('employeeModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm" onsubmit="return submitEmployee(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="emp_fname" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="emp_lname" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select class="form-control" id="emp_role" required>
+                                <option value="Sales Associate">Sales Associate</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Cashier">Cashier</option>
+                                <option value="Technician">Technician</option>
+                                <option value="Inventory Clerk">Inventory Clerk</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Salary (₹)</label>
+                            <input type="number" step="0.01" class="form-control" id="emp_salary" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="emp_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="emp_phone">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('employeeModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('employeeForm').requestSubmit()">Add Employee</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal-overlay" id="orderDetailsModal">
+        <div class="modal" style="max-width:700px">
+            <div class="modal-header">
+                <h3 class="modal-title">📋 Order Details</h3>
+                <button class="modal-close" onclick="closeModal('orderDetailsModal')">✕</button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <div class="loading-spinner"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/customers.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/employees.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

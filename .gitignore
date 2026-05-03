@@ -1,0 +1,9 @@
+node_modules/
+mysql_data/
+.env
+*.log
+*.zip
+*.pdf
+.DS_Store
+Thumbs.db
+.vercel
