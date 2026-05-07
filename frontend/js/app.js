@@ -52,6 +52,8 @@ function loadPageData(page) {
         case 'reports':
             loadCategorySummary();
             loadTopProducts();
+            // Small delay so canvases are rendered before Chart.js runs
+            setTimeout(() => loadAllCharts(), 100);
             break;
     }
 }

@@ -738,3 +738,58 @@ textarea.form-control { resize: vertical; min-height: 76px; }
 .w-full { width: 100%; }
 .hidden { display: none !important; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+/* ============ LIVE CLOCK ============ */
+.live-clock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px 14px;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(79, 156, 247, 0.25);
+    box-shadow: 0 0 12px rgba(79, 156, 247, 0.08);
+    min-width: 120px;
+}
+
+.clock-time {
+    font-family: 'Poppins', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: #4F9CF7;
+    letter-spacing: 1px;
+    line-height: 1.2;
+}
+
+.clock-date {
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ============ CHARTS ============ */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.chart-card { overflow: visible; }
+
+.chart-wrapper {
+    padding: 16px;
+    height: 280px;
+    position: relative;
+}
+
+.chart-wrapper-wide {
+    padding: 16px;
+    height: 260px;
+    position: relative;
+}
+
+@media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .chart-wrapper { height: 240px; }
+}

@@ -7,6 +7,7 @@
     <title>ElectraStore — Electronics Store Management System</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <!-- Toast Notification Container -->
@@ -66,6 +67,10 @@
             <header class="top-header">
                 <div class="header-left">
                     <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+                    <div id="liveClock" class="live-clock">
+                        <div class="clock-time" id="clockTime">00:00:00</div>
+                        <div class="clock-date" id="clockDate">Loading...</div>
+                    </div>
                     <div>
                         <div class="header-title" id="pageTitle">Dashboard</div>
                         <div class="header-breadcrumb" id="pageBreadcrumb">Home / Dashboard</div>
@@ -341,11 +346,45 @@
                 <!-- ============ REPORTS PAGE ============ -->
                 <section class="page-section" id="page-reports">
                     <h2 class="mb-3">Reports & Analytics</h2>
-                    
+
+                    <!-- ===== CHARTS ROW ===== -->
+                    <div class="charts-grid mb-3">
+                        <!-- Bar Chart: Revenue by Category -->
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h3 class="card-title">📊 Revenue by Category</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chartCategoryRevenue"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Doughnut Chart: Order Status -->
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h3 class="card-title">🍩 Order Status Breakdown</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chartOrderStatus"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Chart: Monthly Sales -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">📈 Monthly Sales Trend (2026)</h3>
+                            <button class="btn btn-ghost btn-sm" onclick="loadAllCharts()">🔄 Refresh Charts</button>
+                        </div>
+                        <div class="chart-wrapper-wide">
+                            <canvas id="chartMonthlySales"></canvas>
+                        </div>
+                    </div>
+
                     <!-- Sales Report -->
                     <div class="card mb-3">
                         <div class="card-header">
-                            <h3 class="card-title">📈 Sales Report</h3>
+                            <h3 class="card-title">🧾 Sales Report</h3>
                             <div class="flex items-center gap-2">
                                 <input type="date" class="form-control" id="reportStartDate" value="2026-01-01" style="width:160px">
                                 <span class="text-muted">to</span>
@@ -374,10 +413,10 @@
                         </div>
                     </div>
 
-                    <!-- Category Revenue -->
+                    <!-- Category Revenue Table -->
                     <div class="card mb-3">
                         <div class="card-header">
-                            <h3 class="card-title">📊 Category Sales Summary</h3>
+                            <h3 class="card-title">📋 Category Sales Summary</h3>
                             <button class="btn btn-ghost btn-sm" onclick="loadCategorySummary()">Refresh</button>
                         </div>
                         <div class="table-container">
@@ -692,5 +731,7 @@
     <script src="js/inventory.js"></script>
     <script src="js/employees.js"></script>
     <script src="js/reports.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/clock.js"></script>
 </body>
 </html>
